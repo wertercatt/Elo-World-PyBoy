@@ -8,7 +8,7 @@ class Pokemon:
         self.level = level
 
 
-class Action(object):
+class Action:
     def __init__(self, move: str, item: str, switched: bool):
         self.switched = switched
         self.item = item
@@ -16,8 +16,15 @@ class Action(object):
 
 
 class Turn:
-    def __init__(self, index: int, action: Action, trainer_battle_mon_index: int, enemy_battle_mon_index: int,
-                 trainer_party_mon_hps: List[int], enemy_party_mon_hps: List[int]):
+    def __init__(
+        self,
+        index: int,
+        action: Action,
+        trainer_battle_mon_index: int,
+        enemy_battle_mon_index: int,
+        trainer_party_mon_hps: List[int],
+        enemy_party_mon_hps: List[int],
+    ):
         self.index = index
         self.action = action
         self.trainer_battle_mon_index = trainer_battle_mon_index
@@ -27,7 +34,15 @@ class Turn:
 
 
 class Battle:
-    def __init__(self, original_path: str, player: "Trainer", enemy: "Trainer", winner: str, seed: str, turns: List[Turn]):
+    def __init__(
+        self,
+        original_path: str,
+        player: "Trainer",
+        enemy: "Trainer",
+        winner: str,
+        seed: str,
+        turns: List[Turn],
+    ):
         self.original_path = original_path
         self.player = player
         self.enemy = enemy
@@ -54,12 +69,13 @@ class Trainer:
         self.lr_elo: Optional[int] = None
 
         from common_methods import get_trainer_by_id
+
         trainer_class, trainer_instance = get_trainer_by_id(class_id, instance_id)
         self.name = trainer_class["class"]
         self.identifier = f"{self.name} #{trainer_instance['index']}"
-        self.location = trainer_instance['location']
+        self.location = trainer_instance["location"]
         for index, pokemon in enumerate(self.party_mons):
-            pokemon.level = trainer_instance['party'][index]['level']
+            pokemon.level = trainer_instance["party"][index]["level"]
 
         self.win_count: Optional[int] = None
         self.lose_count: Optional[int] = None
@@ -75,8 +91,12 @@ class Trainer:
         if not hasattr(self, "win_count") or self.win_count is None:
             self.win_count, self.lose_count, self.draw_count = 0, 0, 0
             for battle in self.battles:
-                if battle.winner == "trainer" and battle.player == self \
-                        or battle.winner == "enemy" and battle.enemy == self:
+                if (
+                    battle.winner == "trainer"
+                    and battle.player == self
+                    or battle.winner == "enemy"
+                    and battle.enemy == self
+                ):
                     self.win_count += 1
                 elif "Draw" in battle.winner:
                     self.draw_count += 1
@@ -86,9 +106,11 @@ class Trainer:
         return self.win_count, self.lose_count, self.draw_count
 
     def __eq__(self, other):
-        return isinstance(other, Trainer) \
-               and other.class_id == self.class_id \
-               and other.instance_id == self.instance_id
+        return (
+            isinstance(other, Trainer)
+            and other.class_id == self.class_id
+            and other.instance_id == self.instance_id
+        )
 
     def __hash__(self):
         return hash(self.class_id * 100 + self.instance_id)
